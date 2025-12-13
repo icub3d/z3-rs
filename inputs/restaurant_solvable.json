@@ -1,0 +1,25 @@
+{
+  "budget": 100,
+  "restaurants": [
+    { "name": "Burger Joint", "cost": 12, "vegan": false },
+    { "name": "Green Garden", "cost": 18, "vegan": true },
+    { "name": "Pizza Palace", "cost": 25, "vegan": false }
+  ],
+  "people": [
+    { 
+      "name": "Alice", 
+      "is_vegan": true, 
+      "ratings": [0, 10, 2] 
+    },
+    { 
+      "name": "Bob", 
+      "is_vegan": false, 
+      "ratings": [8, 5, 9] 
+    },
+    { 
+      "name": "Charlie", 
+      "is_vegan": false, 
+      "ratings": [7, 6, 8] 
+    }
+  ]
+}

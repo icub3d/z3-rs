@@ -1,0 +1,13 @@
+[workspace]
+members = [
+    "part_01_intro",
+    "part_02_solver",
+    "part_03_optimizer",
+    "part_04_push_pop",
+    "part_05_application",
+    "solutions",
+]
+resolver = "2"
+
+[workspace.dependencies]
+z3 = "0.19.6"

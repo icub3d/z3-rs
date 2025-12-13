@@ -1,0 +1,19 @@
+{
+  "budget": 20,
+  "restaurants": [
+    { "name": "Fancy Vegan", "cost": 20, "vegan": true },
+    { "name": "Cheap Burger", "cost": 5, "vegan": false }
+  ],
+  "people": [
+    { 
+      "name": "Alice", 
+      "is_vegan": true, 
+      "ratings": [10, 0] 
+    },
+    { 
+      "name": "Bob", 
+      "is_vegan": false, 
+      "ratings": [5, 10] 
+    }
+  ]
+}
