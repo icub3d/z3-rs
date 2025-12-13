@@ -33,6 +33,27 @@ Add `z3` to your `Cargo.toml`. Since we are in a workspace, it's defined in the 
 z3 = "0.19.6"
 ```
 
+### GitHub Token for `gh-release` (Optional)
+
+If you are using the `gh-release` feature of the `z3` crate (e.g., via `cargo build --features gh-release`), you might encounter GitHub API rate limiting. To avoid this, you can set a GitHub Personal Access Token as an environment variable.
+
+1.  **Generate a GitHub Token:**
+    *   Go to your GitHub settings: `Settings > Developer settings > Personal access tokens > Tokens (classic)`
+    *   Click "Generate new token" and select "Generate new token (classic)".
+    *   Give your token a descriptive name (e.g., `z3-gh-release`).
+    *   No specific scopes are needed for public repositories, but if you encounter issues, ensure `public_repo` or `repo` scopes are granted.
+    *   Generate the token and copy it. **You will not be able to see it again.**
+
+2.  **Set as Environment Variable:**
+    Set the token as `GITHUB_TOKEN` in your shell environment. For example:
+
+    ```bash
+    export GITHUB_TOKEN="YOUR_GENERATED_TOKEN_HERE"
+    ```
+    For persistent setting, add this line to your shell's configuration file (e.g., `~/.bashrc`, `~/.zshrc`, or `~/.config/nushell/config.nu` for nushell users) and then `source` it or restart your terminal.
+
+    **Note:** Replace `YOUR_GENERATED_TOKEN_HERE` with the actual token you copied from GitHub.
+
 ## What is Z3?
 
 Z3 is a high-performance **SMT (Satisfiability Modulo Theories)** solver from Microsoft Research.
