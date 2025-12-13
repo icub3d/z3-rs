@@ -10,6 +10,26 @@ Standard solving involves defining a problem, checking it, and finishing. Increm
     *   `solver.push()`: Creates a new "scope" or "checkpoint". Any assertions added after this can be undone.
     *   `solver.pop(n)`: Removes the last `n` scopes, discarding all assertions and state changes made within them.
 
+    ```mermaid
+    graph TD
+        subgraph Base["Base Level"]
+            C1[Constraint: x < 10]
+        end
+
+        subgraph Scope1["Scope 1 (After push)"]
+            C2[Constraint: x > 5]
+            Base --> C2
+        end
+
+        subgraph Result["After Pop"]
+            Back[Back to Base Level: x < 10]
+        end
+
+        C1 -- push() --> C2
+        C2 -- pop() --> Back
+        style Scope1 stroke-dasharray: 5 5
+    ```
+
 2.  **Incremental Performance:**
     *   Z3 retains learned clauses and heuristics from the base level.
     *   Solving `Constraint A + Constraint B`, popping B, then solving `Constraint A + Constraint C` is much faster than starting over, because Z3 already "understands" Constraint A.

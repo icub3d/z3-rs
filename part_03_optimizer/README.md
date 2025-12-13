@@ -16,6 +16,7 @@ In this part, we explore the `Optimize` struct, which extends the capabilities o
     *   These are optional. The optimizer tries to satisfy as many as possible.
     *   You can assign **weights** to soft constraints. Z3 will minimize the sum of weights of *unsatisfied* soft constraints.
     *   This is useful for problems where perfect solutions might not exist, or where you want to express preferences.
+    *   **Important:** Soft constraints with the **same group ID** have their penalties summed together as a single objective. Soft constraints with **different group IDs** are treated as separate objectives and optimized lexicographically (first objective, then second, etc.). To get weighted preference behavior, use the same group ID for all related soft constraints.
 
 ## Code Walkthrough
 
@@ -61,6 +62,64 @@ We have implemented three examples in `src/main.rs`.
 3.  For each counter `c_j`, the sum of presses for all buttons affecting `c_j` must equal the target value for `c_j`.
 4.  Objective: Minimize $\sum p_i$.
 
+### Example 4: Soft Constraints (Meeting Scheduling)
+
+**Goal:** Schedule a meeting time considering participant preferences with different priorities.
+
+**Scenarios:**
+1.  **Equal Weights:** Alice prefers 9 AM (Weight 10) vs Bob prefers 10 AM (Weight 10)
+    *   With equal weights, violating either person costs 10. Z3 picks arbitrarily.
+    
+2.  **Unequal Weights:** Alice prefers 9 AM (Weight 10) vs Boss prefers 10 AM (Weight 50)
+    *   Choosing 9 AM: violate Boss = 50 penalty
+    *   Choosing 10 AM: violate Alice = 10 penalty
+    *   Z3 chooses 10 AM to minimize penalty (10 < 50)
+
+3.  **Multiple Preferences:** Alice (9 AM), Bob (10 AM), Charlie (11 AM) all weight 10, plus Boss (10 AM, weight 50)
+    *   Choosing 9 AM: violate Bob + Boss + Charlie = 10 + 50 + 10 = 70 penalty
+    *   Choosing 10 AM: violate Alice + Charlie = 10 + 10 = 20 penalty
+    *   Choosing 11 AM: violate Alice + Bob + Boss = 10 + 10 + 50 = 70 penalty
+    *   Z3 chooses 10 AM to minimize total penalty (20 < 70)
+
+**Key Insight:** All soft constraints use the **same group ID** (`"preferences"`), which tells Z3 to sum their penalties into a single objective. Without a common group ID, Z3 would treat each as a separate objective and optimize lexicographically instead of minimizing the total penalty.
+
+## Soft Constraints Visualization
+
+```mermaid
+flowchart TD
+    Start[Meeting Scheduling Problem] --> Scenario1[Scenario 1: Equal Weights]
+    Start --> Scenario2[Scenario 2: Unequal Weights]
+    Start --> Scenario3[Scenario 3: Multiple Preferences]
+    
+    Scenario1 --> S1_Options{Evaluate Options}
+    S1_Options --> S1_9AM["9 AM: Violate Bob<br/>Penalty = 10"]
+    S1_Options --> S1_10AM["10 AM: Violate Alice<br/>Penalty = 10"]
+    S1_9AM --> S1_Result["Result: Arbitrary choice<br/>(Both equal penalty)"]
+    S1_10AM --> S1_Result
+    
+    Scenario2 --> S2_Options{Evaluate Options}
+    S2_Options --> S2_9AM["9 AM: Violate Boss<br/>Penalty = 50"]
+    S2_Options --> S2_10AM["10 AM: Violate Alice<br/>Penalty = 10"]
+    S2_9AM --> S2_Result["✓ Result: 10 AM<br/>(10 < 50)"]
+    S2_10AM --> S2_Result
+    
+    Scenario3 --> S3_Options{Evaluate Options}
+    S3_Options --> S3_9AM["9 AM<br/>Violate: Bob(10) + Boss(50) + Charlie(10)<br/>Penalty = 70"]
+    S3_Options --> S3_10AM["10 AM<br/>Violate: Alice(10) + Charlie(10)<br/>Penalty = 20"]
+    S3_Options --> S3_11AM["11 AM<br/>Violate: Alice(10) + Bob(10) + Boss(50)<br/>Penalty = 70"]
+    S3_9AM --> S3_Result["✓ Result: 10 AM<br/>(20 < 70)"]
+    S3_10AM --> S3_Result
+    S3_11AM --> S3_Result
+    
+    style S1_Result fill:#e1f5ff
+    style S2_Result fill:#d4edda
+    style S3_Result fill:#d4edda
+    style S2_10AM fill:#d4edda
+    style S3_10AM fill:#d4edda
+```
+
+This diagram illustrates how Z3's optimizer evaluates different meeting times and chooses the one that minimizes the total penalty from violated soft constraints.
+
 ## Running the Code
 
 ```bash
@@ -95,4 +154,10 @@ Determine the optimal number of Chairs and Tables to produce to **maximize reven
 *   Variables `c` (chairs) and `t` (tables) must be >= 0.
 *   Add constraints for total carpentry time and total painting time.
 *   Maximize `20*c + 50*t`.
+
+## Further Reading
+
+*   **Knapsack Problem:** [https://en.wikipedia.org/wiki/Knapsack_problem](https://en.wikipedia.org/wiki/Knapsack_problem)
+*   **Mathematical Optimization:** [https://en.wikipedia.org/wiki/Mathematical_optimization](https://en.wikipedia.org/wiki/Mathematical_optimization)
+
 

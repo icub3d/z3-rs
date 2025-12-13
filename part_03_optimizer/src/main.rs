@@ -242,9 +242,121 @@ fn solve_aoc_day10() {
     );
 }
 
+/// Represents a person's preference for a meeting time
+#[allow(dead_code)]
+struct Preference {
+    name: &'static str,
+    time: i64,
+    weight: u32,
+}
+
+/// Solves a meeting scheduling problem with soft constraints
+fn solve_meeting_schedule(scenario: &str, preferences: &[Preference], explanation: &str) {
+    println!("\n{}", scenario);
+
+    let opt = Optimize::new();
+    let time = Int::new_const("meeting_time");
+
+    // Hard constraints: meeting must be between 9 and 11 AM
+    opt.assert(&time.ge(Int::from_i64(9)));
+    opt.assert(&time.le(Int::from_i64(11)));
+
+    // Soft constraints: add each person's preference
+    // Use the same group so penalties are summed
+    for pref in preferences {
+        opt.assert_soft(
+            &time.eq(Int::from_i64(pref.time)),
+            pref.weight,
+            Some("preferences".into()),
+        );
+    }
+
+    // Z3 automatically minimizes soft constraint violations
+    if opt.check(&[]) == SatResult::Sat {
+        let model = opt.get_model().unwrap();
+        let selected_time = model.eval(&time, true).unwrap().as_i64().unwrap();
+        println!("  Selected Time: {} AM", selected_time);
+        println!("  {}", explanation);
+    }
+}
+
+/// Example 4: Soft Constraints
+/// Goal: Schedule a meeting where participants have conflicting preferences.
+/// Soft constraints allow expressing preferences that should be satisfied if possible.
+/// Z3 minimizes the sum of weights of violated soft constraints.
+fn demonstrate_soft_constraints() {
+    println!("\n--- Soft Constraints (Meeting Scheduling) ---");
+
+    // Scenario 1: Two conflicting preferences with equal weight
+    solve_meeting_schedule(
+        "Scenario 1: Alice (9 AM, weight 10) vs Bob (10 AM, weight 10)",
+        &[
+            Preference {
+                name: "Alice",
+                time: 9,
+                weight: 10,
+            },
+            Preference {
+                name: "Bob",
+                time: 10,
+                weight: 10,
+            },
+        ],
+        "(Equal weights: Z3 picks arbitrarily between 9 or 10)",
+    );
+
+    // Scenario 2: Unequal weights - boss overrules
+    solve_meeting_schedule(
+        "Scenario 2: Alice (9 AM, weight 10) vs Boss (10 AM, weight 50)",
+        &[
+            Preference {
+                name: "Alice",
+                time: 9,
+                weight: 10,
+            },
+            Preference {
+                name: "Boss",
+                time: 10,
+                weight: 50,
+            },
+        ],
+        "(Boss's weight 50 > Alice's 10, so Boss's preference wins)",
+    );
+
+    // Scenario 3: Three people with one weighted heavily
+    println!("\nScenario 3: Alice (9 AM), Bob (10 AM), Charlie (11 AM) all weight 10,");
+    println!("            Boss (10 AM, weight 50) joins Bob");
+    solve_meeting_schedule(
+        "",
+        &[
+            Preference {
+                name: "Alice",
+                time: 9,
+                weight: 10,
+            },
+            Preference {
+                name: "Bob",
+                time: 10,
+                weight: 10,
+            },
+            Preference {
+                name: "Charlie",
+                time: 11,
+                weight: 10,
+            },
+            Preference {
+                name: "Boss",
+                time: 10,
+                weight: 50,
+            },
+        ],
+        "(10 AM: violate Alice=10 + Charlie=10 = 20 penalty - BEST!)",
+    );
+}
+
 fn main() {
     demonstrate_minimization();
     demonstrate_maximization();
     solve_aoc_day10();
+    demonstrate_soft_constraints();
 }
-

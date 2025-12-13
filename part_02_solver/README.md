@@ -82,3 +82,10 @@ Find a 3x3 Magic Square using digits 1 through 9.
 *   You can define variables like `r0_c0`, `r0_c1`, etc., or use a `Vec` of `Vec`.
 *   Z3 has a special helper: `z3::ast::Int::distinct(ctx, &[&x, &y, ...])`.
 *   (Or in Rust z3 crate: `Ast::distinct(&[&x, &y, ...])`).
+
+## Further Reading
+
+*   **Constraint Satisfaction Problems:** [https://en.wikipedia.org/wiki/Constraint_satisfaction_problem](https://en.wikipedia.org/wiki/Constraint_satisfaction_problem)
+*   **Verbal Arithmetic (Send More Money):** [https://en.wikipedia.org/wiki/Verbal_arithmetic](https://en.wikipedia.org/wiki/Verbal_arithmetic)
+*   **Magic Square:** [https://en.wikipedia.org/wiki/Magic_square](https://en.wikipedia.org/wiki/Magic_square)
+
