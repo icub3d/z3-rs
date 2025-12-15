@@ -2,6 +2,11 @@
 
 This repository contains the code for a tutorial series on using the Z3 Theorem Prover with Rust.
 
+The companion Videos and Drawing are available here:
+
+- https://www.tldraw.com/f/2Fd1WALiXIPpbWYM5EQFs?d=v0.0.1851.1030.page
+- https://www.youtube.com/playlist?list=PLK9NYUdlGQITi22-AhhSbtOJrDBasaMcs
+
 ## Series Outline
 
 ### Part 1: Introduction to Z3 & Setup
