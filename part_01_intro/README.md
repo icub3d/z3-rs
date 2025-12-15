@@ -4,7 +4,17 @@ This project introduces the Z3 Theorem Prover and how to use it within Rust. We 
 
 ## Setup & Installation
 
-The `z3` crate in Rust is a wrapper around the Z3 C++ library. You need to have the Z3 library installed on your system for the crate to link against.
+The `z3` crate in Rust is a wrapper around the Z3 C++ library. You need to have the Z3 library installed on your system for the crate to link against or use the `gh-release` feature enabled to download a pre-built library.
+
+### Rust Dependency
+
+Add `z3` to your `Cargo.toml`. Since we are in a workspace, it's defined in the root `Cargo.toml`.
+```toml
+[dependencies]
+z3 = "0.19.6"
+```
+
+Then pick an option below that best suits your situation.
 
 ### Linux (Ubuntu/Debian)
 
@@ -25,17 +35,9 @@ You generally have two options:
 1.  **Vcpkg:** Use `vcpkg` to install `z3`.
 2.  **Pre-built Binaries:** Download pre-built binaries from the [Z3 releases page](https://github.com/Z3Prover/z3/releases), extract them, and ensure the `bin` folder is in your system's `PATH` and `lib` folder is accessible to the Rust linker.
 
-### Rust Dependency
+### `gh-release`
 
-Add `z3` to your `Cargo.toml`. Since we are in a workspace, it's defined in the root `Cargo.toml`.
-```toml
-[dependencies]
-z3 = "0.19.6"
-```
-
-### GitHub Token for `gh-release` (Optional)
-
-If you are using the `gh-release` feature of the `z3` crate (e.g., via `cargo build --features gh-release`), you might encounter GitHub API rate limiting. To avoid this, you can set a GitHub Personal Access Token as an environment variable.
+You can add the `gh-release` feature of the `z3` crate (e.g., via `cargo build --features gh-release`). And it will download a pre-built library for you. If you do, you might encounter GitHub API rate limiting. To avoid this, you can set a GitHub Personal Access Token as an environment variable.
 
 1.  **Generate a GitHub Token:**
     *   Go to your GitHub settings: `Settings > Developer settings > Personal access tokens > Tokens (classic)`
@@ -53,6 +55,7 @@ If you are using the `gh-release` feature of the `z3` crate (e.g., via `cargo bu
     For persistent setting, add this line to your shell's configuration file (e.g., `~/.bashrc`, `~/.zshrc`, or `~/.config/nushell/config.nu` for nushell users) and then `source` it or restart your terminal.
 
     **Note:** Replace `YOUR_GENERATED_TOKEN_HERE` with the actual token you copied from GitHub.
+
 
 ## What is Z3?
 

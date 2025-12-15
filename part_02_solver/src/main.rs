@@ -23,7 +23,7 @@ fn demonstrate_basic_solving() {
 
     // Check for Satisfiability and Retrieve Model
     if solver.check() == SatResult::Sat {
-        // If SAT, we can get a "Model", which contains concrete values for our variables. We can print them like before, or just print the model. Let's try that this time.
+        // If SAT, we can get a "Model", which contains concrete values for our variables.
         let model = solver.get_model().unwrap();
         println!("{model:?}");
     } else {
@@ -151,14 +151,14 @@ fn solve_aoc_day24() {
     let rvy = Int::new_const("rvy");
     let rvz = Int::new_const("rvz");
 
-    // Add Constraints for each Hailstone
+    // Define and Add Constraints for each Hailstone
     for (i, h) in hailstones.iter().enumerate() {
         // Define a unique time variable t_i for this collision
         // Each collision happens at a different time!
         let t = Int::new_const(format!("t_{}", i));
 
         // Constraint: Collision must happen in the future (t >= 0)
-        solver.assert(t.ge(Int::from_i64(0)));
+        solver.assert(t.ge(0));
 
         // Physics Equation: Position = Start + Velocity * Time
         // We assert that Rock's position at time t equals Hailstone's position at time t.
@@ -208,4 +208,3 @@ fn main() {
     demonstrate_multiple_solutions();
     solve_aoc_day24();
 }
-

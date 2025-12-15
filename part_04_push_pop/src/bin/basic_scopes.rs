@@ -24,6 +24,11 @@ fn demonstrate_basic_scopes() {
     println!("   Asserting (Scope 1): x > 5");
     solver.assert(x.gt(&val_5));
 
+    // Print out the solver state:
+    println!("Solver State:");
+    println!("{solver:?}");
+    println!();
+
     // Check
     print!("   Checking Scope 1: ");
     if solver.check() == SatResult::Sat {
@@ -46,6 +51,11 @@ fn demonstrate_basic_scopes() {
     println!("   Asserting (Scope 2): x == 2");
     solver.assert(x.eq(&val_2));
 
+    // Print out the solver state:
+    println!("Solver State:");
+    println!("{solver:?}");
+    println!();
+
     print!("   Checking Scope 2: ");
     if solver.check() == SatResult::Sat {
         let model = solver.get_model().unwrap();
@@ -56,6 +66,11 @@ fn demonstrate_basic_scopes() {
 
     println!("<< Popping Scope 2");
     solver.pop(1);
+
+    // Print out the solver state:
+    println!("Solver State:");
+    println!("{solver:?}");
+    println!();
 }
 
 fn main() {

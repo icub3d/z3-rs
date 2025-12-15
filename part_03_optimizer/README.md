@@ -20,7 +20,7 @@ In this part, we explore the `Optimize` struct, which extends the capabilities o
 
 ## Code Walkthrough
 
-We have implemented three examples in `src/main.rs`.
+We have implemented four examples in `src/main.rs`.
 
 ### Example 1: Basic Minimization
 
@@ -123,7 +123,7 @@ This diagram illustrates how Z3's optimizer evaluates different meeting times an
 ## Running the Code
 
 ```bash
-car go run -p part_03_optimizer
+cargo run -p part_03_optimizer
 ```
 
 ## Homework: Production Planning

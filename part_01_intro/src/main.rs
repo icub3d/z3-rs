@@ -12,15 +12,13 @@ fn solve_system_of_equations() {
     // Create a Solver
     let solver = Solver::new();
 
-    // Define Variables and Constants
+    // Define Variables
     let x = Int::new_const("x");
     let y = Int::new_const("y");
-    let ten = Int::from_i64(10);
-    let two = Int::from_i64(2);
 
     // Assert Constraints
-    solver.assert((&x + &y).eq(&ten));
-    solver.assert((&x - &y).eq(&two));
+    solver.assert((&x + &y).eq(10));
+    solver.assert((&x - &y).eq(2));
 
     // Check for Satisfiability
     println!("Solving System:");
@@ -34,13 +32,8 @@ fn solve_system_of_equations() {
             // Retrieve the Model
             let model = solver.get_model().unwrap();
 
-            // Get variables from the model.
-            let x_val = model.eval(&x, true).unwrap().as_i64().unwrap();
-            let y_val = model.eval(&y, true).unwrap().as_i64().unwrap();
-
             println!("solution:");
-            println!("  x = {}", x_val);
-            println!("  y = {}", y_val);
+            println!("{model:?}");
         }
         z3::SatResult::Unsat => println!("result: UNSATISFIABLE"),
         z3::SatResult::Unknown => println!("result: UNKNOWN"),
@@ -62,14 +55,11 @@ fn solve_optimization() {
     // Define Variables and Constants
     let x = Int::new_const("x");
     let y = Int::new_const("y");
-    let zero = Int::from_i64(0);
-    let ten = Int::from_i64(10);
-    let two = Int::from_i64(2);
 
     // Assert Constraints
-    optimizer.assert(&x.gt(&zero));
-    optimizer.assert(&y.gt(&zero));
-    optimizer.assert(&(&two * &x + &y).ge(&ten));
+    optimizer.assert(&x.gt(0));
+    optimizer.assert(&y.gt(0));
+    optimizer.assert(&(2i64 * &x + &y).ge(10));
 
     println!("Optimizing system:");
     println!("  Minimize: x + y");
@@ -107,4 +97,3 @@ fn main() {
     solve_system_of_equations();
     solve_optimization();
 }
-

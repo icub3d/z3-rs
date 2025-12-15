@@ -16,7 +16,7 @@ This repository contains the code for a tutorial series on using the Z3 Theorem 
 - **Project:** `part_02_solver`
 
 ### Part 3: The Optimizer
-- **Topic:** Using the `Optimize` context.
+- **Topic:** Using the `Optimize`.
 - **Key Concepts:** Hard vs. Soft constraints, Minimization, Maximization.
 - **Project:** `part_03_optimizer`
 
