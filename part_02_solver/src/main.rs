@@ -1,12 +1,12 @@
 use z3::ast::Int;
 use z3::{SatResult, Solver};
 
-/// Example 1: Basic Solver Usage
-/// Goal: Find integers x and y such that:
+/// Example 1: Basic Solver With Multiple Solutions
+/// Goal: Find all Integers x and y such that:
 ///   1. x > 10
 ///   2. y > 10
 ///   3. x + y = 25
-fn demonstrate_basic_solving() {
+fn demonstrate_multiple_solutions() {
     println!("--- Basic Solving ---");
 
     // Create a Solver
@@ -17,52 +17,13 @@ fn demonstrate_basic_solving() {
     let y = Int::new_const("y");
 
     // Assert Constraints
-    solver.assert(x.gt(Int::from_i64(10)));
-    solver.assert(y.gt(Int::from_i64(10)));
-    solver.assert((&x + &y).eq(Int::from_i64(25)));
-
-    // Check for Satisfiability and Retrieve Model
-    if solver.check() == SatResult::Sat {
-        // If SAT, we can get a "Model", which contains concrete values for our variables.
-        let model = solver.get_model().unwrap();
-        println!("{model:?}");
-    } else {
-        println!("UNSAT");
-    }
-}
-
-/// Example 2: Finding Multiple Solutions
-/// Goal: Find ALL distinct pairs (x, y) such that:
-///   1. 0 <= x, y <= 2
-///   2. x + y = 2
-///
-/// Strategy:
-///   1. Find a solution.
-///   2. Add a constraint that "blocks" this solution (NOT (x=val AND y=val)).
-///   3. Repeat until UNSAT.
-fn demonstrate_multiple_solutions() {
-    println!("\n--- Finding Multiple Solutions ---");
-
-    // Create a Solver
-    let solver = Solver::new();
-
-    // Define Variables
-    let x = Int::new_const("x");
-    let y = Int::new_const("y");
-    let zero = Int::from_i64(0);
-    let two = Int::from_i64(2);
-
-    // Assert Constraints
-    solver.assert(x.ge(&zero));
-    solver.assert(x.le(&two));
-    solver.assert(y.ge(&zero));
-    solver.assert(y.le(&two));
-    solver.assert((&x + &y).eq(&two));
-
-    let mut count = 0;
+    solver.assert(x.gt(10));
+    solver.assert(y.gt(10));
+    solver.assert((&x + &y).eq(25));
 
     // Use the `solutions` iterator to automatically find all satisfying assignments
     // for the tuple (x, y). The second argument `true` enables model completion.
+    let mut count = 0;
     for (x_sol, y_sol) in solver.solutions((&x, &y), true) {
         count += 1;
         // The iterator returns new AST nodes representing the concrete values from the model
@@ -74,7 +35,7 @@ fn demonstrate_multiple_solutions() {
     println!("Found {} total solutions.", count);
 }
 
-/// Example 3: Advent of Code 2023 Day 24 (Part 2)
+/// Example 2: Advent of Code 2023 Day 24 (Part 2)
 /// Goal: Find the initial position and velocity of a rock that will collide with
 /// all hailstones at some point in time.
 ///
@@ -204,7 +165,6 @@ fn solve_aoc_day24() {
 }
 
 fn main() {
-    demonstrate_basic_solving();
     demonstrate_multiple_solutions();
     solve_aoc_day24();
 }
