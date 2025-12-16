@@ -66,9 +66,9 @@ We have implemented three examples in `src/main.rs`.
     *   Choosing 10 AM: violate Alice = 10 penalty
     *   Z3 chooses 10 AM to minimize penalty (10 < 50)
 
-3.  **Multiple Preferences:** Alice (9 AM), Bob (10 AM), Charlie (11 AM) all weight 10, plus Boss (10 AM, weight 50)
-    *   Choosing 9 AM: violate Bob + Boss + Charlie = 10 + 50 + 10 = 70 penalty
-    *   Choosing 10 AM: violate Alice + Charlie = 10 + 10 = 20 penalty
+3.  **Multiple Preferences:** Alice (9 AM, weight 10), Bob (10 AM, weight 10), Charlie (11 AM, weight 55) , plus Boss (10 AM, weight 50)
+    *   Choosing 9 AM: violate Bob + Boss + Charlie = 10 + 50 + 55 = 115 penalty
+    *   Choosing 10 AM: violate Alice + Charlie = 10 + 55 = 65 penalty
     *   Choosing 11 AM: violate Alice + Bob + Boss = 10 + 10 + 50 = 70 penalty
     *   Z3 chooses 10 AM to minimize total penalty (20 < 70)
 
@@ -124,10 +124,10 @@ flowchart TD
 
     Scenario3[Scenario 3: Multiple Preferences]:::scenario
     Scenario3 --> S3_Options{Evaluate Options}:::decision
-    S3_Options --> S3_9AM["9 AM<br/>Violate: Bob(10) + Boss(50) + Charlie(10)<br/>Penalty = 70"]
-    S3_Options --> S3_10AM["10 AM<br/>Violate: Alice(10) + Charlie(10)<br/>Penalty = 20"]:::highlight
+    S3_Options --> S3_9AM["9 AM<br/>Violate: Bob(10) + Boss(50) + Charlie(55)<br/>Penalty = 115"]
+    S3_Options --> S3_10AM["10 AM<br/>Violate: Alice(10) + Charlie(55)<br/>Penalty = 65"]:::highlight
     S3_Options --> S3_11AM["11 AM<br/>Violate: Alice(10) + Bob(10) + Boss(50)<br/>Penalty = 70"]
-    S3_9AM --> S3_Result["✓ Result: 10 AM<br/>(20 < 70)"]:::highlight
+    S3_9AM --> S3_Result["✓ Result: 10 AM<br/>(65 < 70)"]:::highlight
     S3_10AM --> S3_Result
     S3_11AM --> S3_Result
 ```

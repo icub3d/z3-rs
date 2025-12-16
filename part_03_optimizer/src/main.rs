@@ -71,7 +71,7 @@ fn demonstrate_maximization() {
     }
 
     // Constraint: Total Weight <= Limit
-    opt.assert(&total_weight.le(Int::from_i64(limit)));
+    opt.assert(&total_weight.le(limit));
 
     // Objective: Maximize Total Value
     opt.maximize(&total_value);
@@ -161,7 +161,7 @@ fn solve_aoc_day10() {
 
         // Basic Constraint: Presses must be non-negative
         for p in &presses {
-            opt.assert(&p.ge(Int::from_i64(0)));
+            opt.assert(&p.ge(0));
         }
 
         // Target Constraints
@@ -278,7 +278,7 @@ fn demonstrate_soft_constraints() {
     );
 
     // Scenario 3: Three people with one weighted heavily
-    println!("\nScenario 3: Alice (9 AM), Bob (10 AM), Charlie (11 AM) all weight 10,");
+    println!("\nScenario 3: Alice (9 AM, 30), Bob (10 AM, 10), Charlie (11 AM, 55) ,");
     println!("            Boss (10 AM, weight 50) joins Bob");
     solve_meeting_schedule(
         "",
@@ -293,14 +293,14 @@ fn demonstrate_soft_constraints() {
             },
             Preference {
                 time: 11,
-                weight: 10,
+                weight: 55,
             },
             Preference {
                 time: 10,
                 weight: 50,
             },
         ],
-        "(10 AM: violate Alice=10 + Charlie=10 = 20 penalty - BEST!)",
+        "(10 AM: minimum weight is bob + boss)",
     );
 }
 
