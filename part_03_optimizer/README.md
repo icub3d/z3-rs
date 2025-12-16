@@ -70,7 +70,7 @@ We have implemented three examples in `src/main.rs`.
     *   Choosing 9 AM: violate Bob + Boss + Charlie = 10 + 50 + 55 = 115 penalty
     *   Choosing 10 AM: violate Alice + Charlie = 10 + 55 = 65 penalty
     *   Choosing 11 AM: violate Alice + Bob + Boss = 10 + 10 + 50 = 70 penalty
-    *   Z3 chooses 10 AM to minimize total penalty (20 < 70)
+    *   Z3 chooses 10 AM to minimize total penalty (65 < 70)
 
 **Key Insight:** All soft constraints use the **same group ID** (`"preferences"`), which tells Z3 to sum their penalties into a single objective. Without a common group ID, Z3 would treat each as a separate objective and optimize lexicographically instead of minimizing the total penalty.
 
