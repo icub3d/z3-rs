@@ -14,9 +14,10 @@ In this part, we explore the `Optimize` struct, which extends the capabilities o
 
 3.  **Soft Constraints (`assert_soft`):
     *   These are optional. The optimizer tries to satisfy as many as possible.
-    *   You can assign **weights** to soft constraints. Z3 will minimize the sum of weights of *unsatisfied* soft constraints.
+    *   You can assign **weights** (values) to soft constraints. Z3 will find a solution that maximizes the sum of weights of *satisfied* soft constraints.
+    *   (Technically, Z3 minimizes the sum of weights of *unsatisfied* constraints, which is mathematically equivalent to maximizing the satisfied ones).
     *   This is useful for problems where perfect solutions might not exist, or where you want to express preferences.
-    *   **Important:** Soft constraints with the **same group ID** have their penalties summed together as a single objective. Soft constraints with **different group IDs** are treated as separate objectives and optimized lexicographically (first objective, then second, etc.). To get weighted preference behavior, use the same group ID for all related soft constraints.
+    *   **Important:** Soft constraints with the **same group ID** are optimized together. Soft constraints with **different group IDs** are treated as separate objectives and optimized lexicographically. To get weighted preference behavior (maximizing total score), use the same group ID for all related soft constraints.
 
 ## Code Walkthrough
 
@@ -58,25 +59,8 @@ We have implemented three examples in `src/main.rs`.
 **Goal:** Schedule a meeting time considering participant preferences with different priorities.
 
 **Scenarios:**
-1.  **Equal Weights:** Alice prefers 9 AM (Weight 10) vs Bob prefers 10 AM (Weight 10)
-    *   With equal weights, violating either person costs 10. Z3 picks arbitrarily.
-    
-2.  **Unequal Weights:** Alice prefers 9 AM (Weight 10) vs Boss prefers 10 AM (Weight 50)
-    *   Choosing 9 AM: violate Boss = 50 penalty
-    *   Choosing 10 AM: violate Alice = 10 penalty
-    *   Z3 chooses 10 AM to minimize penalty (10 < 50)
-
-3.  **Multiple Preferences:** Alice (9 AM, weight 10), Bob (10 AM, weight 10), Charlie (11 AM, weight 55) , plus Boss (10 AM, weight 50)
-    *   Choosing 9 AM: violate Bob + Boss + Charlie = 10 + 50 + 55 = 115 penalty
-    *   Choosing 10 AM: violate Alice + Charlie = 10 + 55 = 65 penalty
-    *   Choosing 11 AM: violate Alice + Bob + Boss = 10 + 10 + 50 = 70 penalty
-    *   Z3 chooses 10 AM to minimize total penalty (65 < 70)
-
-**Key Insight:** All soft constraints use the **same group ID** (`"preferences"`), which tells Z3 to sum their penalties into a single objective. Without a common group ID, Z3 would treat each as a separate objective and optimize lexicographically instead of minimizing the total penalty.
-
-## Soft Constraints Visualization
-
-### Scenario 1: Equal Weights
+1.  **Equal Weights:** Alice prefers 9 AM (Value 10) vs Bob prefers 10 AM (Value 10)
+    *   With equal weights, satisfying either person yields 10 points. Z3 picks arbitrarily.
 
 ```mermaid
 flowchart TD
@@ -88,13 +72,15 @@ flowchart TD
 
     Scenario1[Scenario 1: Equal Weights]:::scenario
     Scenario1 --> S1_Options{Evaluate Options}:::decision
-    S1_Options --> S1_9AM["9 AM: Violate Bob<br/>Penalty = 10"]
-    S1_Options --> S1_10AM["10 AM: Violate Alice<br/>Penalty = 10"]
-    S1_9AM --> S1_Result["Result: Arbitrary choice<br/>(Both equal penalty)"]:::neutral
+    S1_Options --> S1_9AM["9 AM: Satisfy Alice<br/>Score = 10"]
+    S1_Options --> S1_10AM["10 AM: Satisfy Bob<br/>Score = 10"]
+    S1_9AM --> S1_Result["Result: Arbitrary choice<br/>(Both equal score)"]:::neutral
     S1_10AM --> S1_Result
 ```
-
-### Scenario 2: Unequal Weights
+2.  **Unequal Weights:** Alice prefers 9 AM (Value 10) vs Boss prefers 10 AM (Value 50)
+    *   Choosing 9 AM: Satisfy Alice = 10 score
+    *   Choosing 10 AM: Satisfy Boss = 50 score
+    *   Z3 chooses 10 AM to maximize score (50 > 10)
 
 ```mermaid
 flowchart TD
@@ -106,13 +92,16 @@ flowchart TD
 
     Scenario2[Scenario 2: Unequal Weights]:::scenario
     Scenario2 --> S2_Options{Evaluate Options}:::decision
-    S2_Options --> S2_9AM["9 AM: Violate Boss<br/>Penalty = 50"]
-    S2_Options --> S2_10AM["10 AM: Violate Alice<br/>Penalty = 10"]:::highlight
-    S2_9AM --> S2_Result["✓ Result: 10 AM<br/>(10 < 50)"]:::highlight
+    S2_Options --> S2_9AM["9 AM: Satisfy Alice<br/>Score = 10"]
+    S2_Options --> S2_10AM["10 AM: Satisfy Boss<br/>Score = 50"]:::highlight
+    S2_9AM --> S2_Result["✓ Result: 10 AM<br/>(50 > 10)"]:::highlight
     S2_10AM --> S2_Result
 ```
-
-### Scenario 3: Multiple Preferences
+3.  **Multiple Preferences:** Alice (9 AM, value 10), Bob (10 AM, value 10), Charlie (11 AM, value 55) , plus Boss (10 AM, value 50)
+    *   Choosing 9 AM: Satisfy Alice. Score = 10.
+    *   Choosing 10 AM: Satisfy Bob + Boss. Score = 10 + 50 = 60.
+    *   Choosing 11 AM: Satisfy Charlie. Score = 55.
+    *   Z3 chooses 10 AM to maximize total score (60 is best).
 
 ```mermaid
 flowchart TD
@@ -124,13 +113,15 @@ flowchart TD
 
     Scenario3[Scenario 3: Multiple Preferences]:::scenario
     Scenario3 --> S3_Options{Evaluate Options}:::decision
-    S3_Options --> S3_9AM["9 AM<br/>Violate: Bob(10) + Boss(50) + Charlie(55)<br/>Penalty = 115"]
-    S3_Options --> S3_10AM["10 AM<br/>Violate: Alice(10) + Charlie(55)<br/>Penalty = 65"]:::highlight
-    S3_Options --> S3_11AM["11 AM<br/>Violate: Alice(10) + Bob(10) + Boss(50)<br/>Penalty = 70"]
-    S3_9AM --> S3_Result["✓ Result: 10 AM<br/>(65 < 70)"]:::highlight
+    S3_Options --> S3_9AM["9 AM<br/>Satisfy: Alice(10)<br/>Score = 10"]
+    S3_Options --> S3_10AM["10 AM<br/>Satisfy: Bob(10) + Boss(50)<br/>Score = 60"]:::highlight
+    S3_Options --> S3_11AM["11 AM<br/>Satisfy: Charlie(55)<br/>Score = 55"]
+    S3_9AM --> S3_Result["✓ Result: 10 AM<br/>(60 is max)"]:::highlight
     S3_10AM --> S3_Result
     S3_11AM --> S3_Result
 ```
+**Key Insight:** All soft constraints use the **same group ID** (`"preferences"`), which tells Z3 to aggregate them into a single objective. Without a common group ID, Z3 would treat each as a separate objective and optimize lexicographically instead of maximizing the total score.
+
 ## Running the Code
 
 ```bash

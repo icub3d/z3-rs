@@ -220,7 +220,7 @@ fn solve_meeting_schedule(scenario: &str, preferences: &[Preference], explanatio
     opt.assert(&time.le(Int::from_i64(11)));
 
     // Soft constraints: add each person's preference
-    // Use the same group so penalties are summed
+    // Use the same group so weights are aggregated
     for pref in preferences {
         opt.assert_soft(
             &time.eq(Int::from_i64(pref.time)),
@@ -229,7 +229,7 @@ fn solve_meeting_schedule(scenario: &str, preferences: &[Preference], explanatio
         );
     }
 
-    // Z3 automatically minimizes soft constraint violations
+    // Z3 automatically maximizes satisfied weights (by minimizing violations)
     if opt.check(&[]) == SatResult::Sat {
         let model = opt.get_model().unwrap();
         let selected_time = model.eval(&time, true).unwrap().as_i64().unwrap();
@@ -241,7 +241,7 @@ fn solve_meeting_schedule(scenario: &str, preferences: &[Preference], explanatio
 /// Example 3: Soft Constraints
 /// Goal: Schedule a meeting where participants have conflicting preferences.
 /// Soft constraints allow expressing preferences that should be satisfied if possible.
-/// Z3 minimizes the sum of weights of violated soft constraints.
+/// Z3 maximizes the total weight of satisfied preferences (by minimizing the penalty of unsatisfied ones).
 fn demonstrate_soft_constraints() {
     println!("\n--- Soft Constraints (Meeting Scheduling) ---");
 
@@ -258,7 +258,7 @@ fn demonstrate_soft_constraints() {
                 weight: 10,
             },
         ],
-        "(Equal weights: Z3 picks arbitrarily between 9 or 10)",
+        "(Equal scores: Z3 picks arbitrarily between 9 or 10)",
     );
 
     // Scenario 2: Unequal weights - boss overrules
@@ -274,11 +274,11 @@ fn demonstrate_soft_constraints() {
                 weight: 50,
             },
         ],
-        "(Boss's weight 50 > Alice's 10, so Boss's preference wins)",
+        "(Boss's score 50 > Alice's score 10, so Boss's preference wins)",
     );
 
     // Scenario 3: Three people with one weighted heavily
-    println!("\nScenario 3: Alice (9 AM, 30), Bob (10 AM, 10), Charlie (11 AM, 55) ,");
+    println!("\nScenario 3: Alice (9 AM, 10), Bob (10 AM, 10), Charlie (11 AM, 55) ,");
     println!("            Boss (10 AM, weight 50) joins Bob");
     solve_meeting_schedule(
         "",
@@ -300,7 +300,7 @@ fn demonstrate_soft_constraints() {
                 weight: 50,
             },
         ],
-        "(10 AM: minimum weight is bob + boss)",
+        "(10 AM: Score (Bob 10 + Boss 50) = 60, which is the maximum)",
     );
 }
 
