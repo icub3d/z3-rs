@@ -1,44 +1,7 @@
 use z3::ast::{Bool, Int};
 use z3::{Optimize, SatResult};
 
-/// Example 1: Basic Minimization
-/// Goal: Minimize x + y subject to:
-///   1. x > 0
-///   2. y > 0
-///   3. 2x + y >= 10
-fn demonstrate_minimization() {
-    println!("--- Basic Minimization ---");
-
-    // Create an Optimizer
-    // Unlike Solver, Optimize can handle objective functions (minimize/maximize).
-    let opt = Optimize::new();
-
-    // Define Variables
-    let x = Int::new_const("x");
-    let y = Int::new_const("y");
-
-    // Add Hard Constraints
-    opt.assert(&x.gt(0));
-    opt.assert(&y.gt(0));
-    opt.assert(&(2i64 * &x + &y).ge(10));
-
-    // Add Objective
-    let sum = &x + &y;
-    opt.minimize(&sum);
-
-    // Check and Retrieve Solution
-    if opt.check(&[]) == SatResult::Sat {
-        let model = opt.get_model().unwrap();
-        println!("SAT:");
-        println!("  x = {}", model.eval(&x, true).unwrap());
-        println!("  y = {}", model.eval(&y, true).unwrap());
-        println!("  sum = {}", model.eval(&sum, true).unwrap());
-    } else {
-        println!("UNSAT");
-    }
-}
-
-/// Example 2: The Knapsack Problem (Maximization)
+/// Example 1: The Knapsack Problem (Maximization)
 /// Goal: Maximize value of items taken without exceeding weight limit.
 ///   - Weight Limit: 15
 ///   - Item A: Val 4, Wgt 12
@@ -99,7 +62,7 @@ fn demonstrate_maximization() {
     for (i, item) in items.iter().enumerate() {
         let is_taken = &taken[i];
 
-        // Z3 allows (condition ? then : else) logic using `ite` (If-Then-Else)
+        // Z3 allows if condition { value } else { value} with ite.
         let wgt = is_taken.ite(&Int::from_i64(item.wgt), &Int::from_i64(0));
         let val = is_taken.ite(&Int::from_i64(item.val), &Int::from_i64(0));
 
@@ -135,7 +98,7 @@ fn demonstrate_maximization() {
     }
 }
 
-/// Example 3: Advent of Code 2025 Day 10 Part 2 (Factory)
+/// Example 2: Advent of Code 2025 Day 10 Part 2 (Factory)
 /// Goal: Minimize button presses to reach target joltage levels.
 fn solve_aoc_day10() {
     println!("\n--- AoC Day 10 Part 2 ---");
@@ -275,7 +238,7 @@ fn solve_meeting_schedule(scenario: &str, preferences: &[Preference], explanatio
     }
 }
 
-/// Example 4: Soft Constraints
+/// Example 3: Soft Constraints
 /// Goal: Schedule a meeting where participants have conflicting preferences.
 /// Soft constraints allow expressing preferences that should be satisfied if possible.
 /// Z3 minimizes the sum of weights of violated soft constraints.
@@ -342,7 +305,6 @@ fn demonstrate_soft_constraints() {
 }
 
 fn main() {
-    demonstrate_minimization();
     demonstrate_maximization();
     solve_aoc_day10();
     demonstrate_soft_constraints();

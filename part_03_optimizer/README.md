@@ -20,18 +20,9 @@ In this part, we explore the `Optimize` struct, which extends the capabilities o
 
 ## Code Walkthrough
 
-We have implemented four examples in `src/main.rs`.
+We have implemented three examples in `src/main.rs`.
 
-### Example 1: Basic Minimization
-
-**Goal:** Minimize $x + y$ subject to $x > 0$, $y > 0$, and $2x + y \ge 10$.
-
-**Logic:**
-1.  Define variables `x`, `y`.
-2.  Add hard constraints.
-3.  Call `optimizer.minimize(&(x + y))`.
-
-### Example 2: The Knapsack Problem
+### Example 1: The Knapsack Problem
 
 **Goal:** You have a backpack with weight limit 15. You want to choose items to maximize value without exceeding the weight.
 
@@ -46,7 +37,7 @@ We have implemented four examples in `src/main.rs`.
 2.  Constraint: Total Weight <= 15.
 3.  Objective: Maximize Total Value.
 
-### Example 3: Advent of Code Day 10 Part 2 (Factory)
+### Example 2: Advent of Code Day 10 Part 2 (Factory)
 
 **Goal:** Minimize the total number of button presses required to set machine counters to specific target values.
 
@@ -62,7 +53,7 @@ We have implemented four examples in `src/main.rs`.
 3.  For each counter `c_j`, the sum of presses for all buttons affecting `c_j` must equal the target value for `c_j`.
 4.  Objective: Minimize $\sum p_i$.
 
-### Example 4: Soft Constraints (Meeting Scheduling)
+### Example 3: Soft Constraints (Meeting Scheduling)
 
 **Goal:** Schedule a meeting time considering participant preferences with different priorities.
 
@@ -85,41 +76,61 @@ We have implemented four examples in `src/main.rs`.
 
 ## Soft Constraints Visualization
 
+### Scenario 1: Equal Weights
+
 ```mermaid
 flowchart TD
-    Start[Meeting Scheduling Problem] --> Scenario1[Scenario 1: Equal Weights]
-    Start --> Scenario2[Scenario 2: Unequal Weights]
-    Start --> Scenario3[Scenario 3: Multiple Preferences]
-    
-    Scenario1 --> S1_Options{Evaluate Options}
+    classDef default fill:#f5e0dc,stroke:#313244,stroke-width:2px,color:#11111b
+    classDef highlight fill:#a6e3a1,stroke:#313244,stroke-width:2px,color:#11111b
+    classDef neutral fill:#89dceb,stroke:#313244,stroke-width:2px,color:#11111b
+    classDef decision fill:#fab387,stroke:#313244,stroke-width:2px,color:#11111b
+    classDef scenario fill:#89b4fa,stroke:#313244,stroke-width:2px,color:#11111b
+
+    Scenario1[Scenario 1: Equal Weights]:::scenario
+    Scenario1 --> S1_Options{Evaluate Options}:::decision
     S1_Options --> S1_9AM["9 AM: Violate Bob<br/>Penalty = 10"]
     S1_Options --> S1_10AM["10 AM: Violate Alice<br/>Penalty = 10"]
-    S1_9AM --> S1_Result["Result: Arbitrary choice<br/>(Both equal penalty)"]
+    S1_9AM --> S1_Result["Result: Arbitrary choice<br/>(Both equal penalty)"]:::neutral
     S1_10AM --> S1_Result
-    
-    Scenario2 --> S2_Options{Evaluate Options}
-    S2_Options --> S2_9AM["9 AM: Violate Boss<br/>Penalty = 50"]
-    S2_Options --> S2_10AM["10 AM: Violate Alice<br/>Penalty = 10"]
-    S2_9AM --> S2_Result["✓ Result: 10 AM<br/>(10 < 50)"]
-    S2_10AM --> S2_Result
-    
-    Scenario3 --> S3_Options{Evaluate Options}
-    S3_Options --> S3_9AM["9 AM<br/>Violate: Bob(10) + Boss(50) + Charlie(10)<br/>Penalty = 70"]
-    S3_Options --> S3_10AM["10 AM<br/>Violate: Alice(10) + Charlie(10)<br/>Penalty = 20"]
-    S3_Options --> S3_11AM["11 AM<br/>Violate: Alice(10) + Bob(10) + Boss(50)<br/>Penalty = 70"]
-    S3_9AM --> S3_Result["✓ Result: 10 AM<br/>(20 < 70)"]
-    S3_10AM --> S3_Result
-    S3_11AM --> S3_Result
-    
-    style S1_Result fill:#e1f5ff
-    style S2_Result fill:#d4edda
-    style S3_Result fill:#d4edda
-    style S2_10AM fill:#d4edda
-    style S3_10AM fill:#d4edda
 ```
 
-This diagram illustrates how Z3's optimizer evaluates different meeting times and chooses the one that minimizes the total penalty from violated soft constraints.
+### Scenario 2: Unequal Weights
 
+```mermaid
+flowchart TD
+    classDef default fill:#f5e0dc,stroke:#313244,stroke-width:2px,color:#11111b
+    classDef highlight fill:#a6e3a1,stroke:#313244,stroke-width:2px,color:#11111b
+    classDef neutral fill:#89dceb,stroke:#313244,stroke-width:2px,color:#11111b
+    classDef decision fill:#fab387,stroke:#313244,stroke-width:2px,color:#11111b
+    classDef scenario fill:#89b4fa,stroke:#313244,stroke-width:2px,color:#11111b
+
+    Scenario2[Scenario 2: Unequal Weights]:::scenario
+    Scenario2 --> S2_Options{Evaluate Options}:::decision
+    S2_Options --> S2_9AM["9 AM: Violate Boss<br/>Penalty = 50"]
+    S2_Options --> S2_10AM["10 AM: Violate Alice<br/>Penalty = 10"]:::highlight
+    S2_9AM --> S2_Result["✓ Result: 10 AM<br/>(10 < 50)"]:::highlight
+    S2_10AM --> S2_Result
+```
+
+### Scenario 3: Multiple Preferences
+
+```mermaid
+flowchart TD
+    classDef default fill:#f5e0dc,stroke:#313244,stroke-width:2px,color:#11111b
+    classDef highlight fill:#a6e3a1,stroke:#313244,stroke-width:2px,color:#11111b
+    classDef neutral fill:#89dceb,stroke:#313244,stroke-width:2px,color:#11111b
+    classDef decision fill:#fab387,stroke:#313244,stroke-width:2px,color:#11111b
+    classDef scenario fill:#89b4fa,stroke:#313244,stroke-width:2px,color:#11111b
+
+    Scenario3[Scenario 3: Multiple Preferences]:::scenario
+    Scenario3 --> S3_Options{Evaluate Options}:::decision
+    S3_Options --> S3_9AM["9 AM<br/>Violate: Bob(10) + Boss(50) + Charlie(10)<br/>Penalty = 70"]
+    S3_Options --> S3_10AM["10 AM<br/>Violate: Alice(10) + Charlie(10)<br/>Penalty = 20"]:::highlight
+    S3_Options --> S3_11AM["11 AM<br/>Violate: Alice(10) + Bob(10) + Boss(50)<br/>Penalty = 70"]
+    S3_9AM --> S3_Result["✓ Result: 10 AM<br/>(20 < 70)"]:::highlight
+    S3_10AM --> S3_Result
+    S3_11AM --> S3_Result
+```
 ## Running the Code
 
 ```bash

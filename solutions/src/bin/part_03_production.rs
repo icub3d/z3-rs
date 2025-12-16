@@ -17,11 +17,11 @@ fn main() {
     // 2. Resource Constraints
     // Carpentry: 1h/chair + 4h/table <= 40
     let carpentry_hours = &chairs * 1 + &tables * 4;
-    opt.assert(&carpentry_hours.le(Int::from_i64(40)));
+    opt.assert(&carpentry_hours.le(40));
 
     // Painting: 3h/chair + 1h/table <= 40
     let painting_hours = &chairs * 3 + &tables * 1;
-    opt.assert(&painting_hours.le(Int::from_i64(40)));
+    opt.assert(&painting_hours.le(40));
 
     // 3. Objective: Maximize Profit
     // Profit = $20/chair + $50/table
