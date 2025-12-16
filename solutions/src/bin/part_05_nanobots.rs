@@ -1,9 +1,9 @@
+use serde::Deserialize;
 use std::env;
 use std::fs::File;
 use std::io::{self, Read};
-use z3::{Optimize, SatResult};
 use z3::ast::Int;
-use serde::Deserialize;
+use z3::{Optimize, SatResult};
 
 #[derive(Deserialize, Debug)]
 struct Bot {
@@ -56,10 +56,10 @@ fn main() {
     for bot in &bots {
         // Dist = |tx - bx| + |ty - by| + |tz - bz|
         let d = &dist_1d(&tx, bot.x) + &dist_1d(&ty, bot.y) + &dist_1d(&tz, bot.z);
-        
+
         // In Range: Dist <= r
         let in_range = d.le(Int::from_i64(bot.r));
-        
+
         // Add 1 if true, 0 if false
         let val = in_range.ite(&one, &zero);
         count = &count + &val;
@@ -78,7 +78,7 @@ fn main() {
         let y = model.eval(&ty, true).unwrap();
         let z = model.eval(&tz, true).unwrap();
         let c = model.eval(&count, true).unwrap();
-        
+
         println!("Optimal Coordinate: ({}, {}, {})", x, y, z);
         println!("Bots in range: {}", c);
     } else {

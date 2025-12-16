@@ -10,11 +10,9 @@ fn main() {
     let chairs = Int::new_const("chairs");
     let tables = Int::new_const("tables");
 
-    let zero = Int::from_i64(0);
-
     // 1. Non-negative production
-    opt.assert(&chairs.ge(&zero));
-    opt.assert(&tables.ge(&zero));
+    opt.assert(&chairs.ge(0));
+    opt.assert(&tables.ge(0));
 
     // 2. Resource Constraints
     // Carpentry: 1h/chair + 4h/table <= 40

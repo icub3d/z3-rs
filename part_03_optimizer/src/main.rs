@@ -16,14 +16,11 @@ fn demonstrate_minimization() {
     // Define Variables
     let x = Int::new_const("x");
     let y = Int::new_const("y");
-    let zero = Int::from_i64(0);
-    let ten = Int::from_i64(10);
-    let two = Int::from_i64(2);
 
     // Add Hard Constraints
-    opt.assert(&x.gt(&zero));
-    opt.assert(&y.gt(&zero));
-    opt.assert(&(&two * &x + &y).ge(&ten));
+    opt.assert(&x.gt(0));
+    opt.assert(&y.gt(0));
+    opt.assert(&(2i64 * &x + &y).ge(10));
 
     // Add Objective
     let sum = &x + &y;
@@ -138,7 +135,7 @@ fn demonstrate_maximization() {
     }
 }
 
-/// Example 3: Advent of Code Day 10 Part 2 (Factory)
+/// Example 3: Advent of Code 2025 Day 10 Part 2 (Factory)
 /// Goal: Minimize button presses to reach target joltage levels.
 fn solve_aoc_day10() {
     println!("\n--- AoC Day 10 Part 2 ---");
@@ -243,9 +240,7 @@ fn solve_aoc_day10() {
 }
 
 /// Represents a person's preference for a meeting time
-#[allow(dead_code)]
 struct Preference {
-    name: &'static str,
     time: i64,
     weight: u32,
 }
@@ -292,12 +287,10 @@ fn demonstrate_soft_constraints() {
         "Scenario 1: Alice (9 AM, weight 10) vs Bob (10 AM, weight 10)",
         &[
             Preference {
-                name: "Alice",
                 time: 9,
                 weight: 10,
             },
             Preference {
-                name: "Bob",
                 time: 10,
                 weight: 10,
             },
@@ -310,12 +303,10 @@ fn demonstrate_soft_constraints() {
         "Scenario 2: Alice (9 AM, weight 10) vs Boss (10 AM, weight 50)",
         &[
             Preference {
-                name: "Alice",
                 time: 9,
                 weight: 10,
             },
             Preference {
-                name: "Boss",
                 time: 10,
                 weight: 50,
             },
@@ -330,22 +321,18 @@ fn demonstrate_soft_constraints() {
         "",
         &[
             Preference {
-                name: "Alice",
                 time: 9,
                 weight: 10,
             },
             Preference {
-                name: "Bob",
                 time: 10,
                 weight: 10,
             },
             Preference {
-                name: "Charlie",
                 time: 11,
                 weight: 10,
             },
             Preference {
-                name: "Boss",
                 time: 10,
                 weight: 50,
             },
