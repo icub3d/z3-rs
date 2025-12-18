@@ -97,6 +97,5 @@ You have a complex map with **10 regions** (Nodes 0-9) connected in the structur
 
 ## Further Reading
 
-*   [Z3 Guide: Incremental Solving](https://z3prover.github.io/api/html/z3.html#incremental-solving)
 *   [Satisfiability Modulo Theories (SMT)](https://en.wikipedia.org/wiki/Satisfiability_modulo_theories)
 *   [Petersen Graph on Wikipedia](https://en.wikipedia.org/wiki/Petersen_graph)
