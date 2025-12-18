@@ -48,14 +48,11 @@ impl SudokuSolver {
     }
 
     fn init_constraints(&self) {
-        let one = Int::from_i64(1);
-        let four = Int::from_i64(4);
-
         // Range 1..=4
         for r in 0..4 {
             for c in 0..4 {
-                self.solver.assert(self.cells[r][c].ge(&one));
-                self.solver.assert(self.cells[r][c].le(&four));
+                self.solver.assert(self.cells[r][c].ge(1));
+                self.solver.assert(self.cells[r][c].le(4));
             }
         }
 
@@ -93,7 +90,7 @@ impl SudokuSolver {
         let name = format!("({},{})={}", r, c, val);
         let tracker = Bool::new_const(name.as_str());
         self.solver
-            .assert_and_track(&self.cells[r][c].eq(&z3_val), &tracker);
+            .assert_and_track(self.cells[r][c].eq(&z3_val), &tracker);
     }
 
     // Pop the last scope

@@ -75,35 +75,7 @@ cargo run -p part_04_push_pop --bin sudoku
 **Scenario:**
 You have a complex map with **10 regions** (Nodes 0-9) connected in the structure of a **Petersen Graph**.
 
-```mermaid
-graph TD
-    classDef default fill:#f5e0dc,stroke:#313244,stroke-width:2px,color:#11111b
-    classDef highlight fill:#a6e3a1,stroke:#313244,stroke-width:2px,color:#11111b
-
-    subgraph "Outer Cycle"
-        0 --- 1
-        1 --- 2
-        2 --- 3
-        3 --- 4
-        4 --- 0
-    end
-
-    subgraph "Inner Star"
-        5 --- 7
-        7 --- 9
-        9 --- 6
-        6 --- 8
-        8 --- 5
-    end
-
-    subgraph "Spokes"
-        0 --- 5
-        1 --- 6
-        2 --- 7
-        3 --- 8
-        4 --- 9
-    end
-```
+![Petersen Graph](petersen.svg)
 
 *   **Outer Cycle:** 0-1, 1-2, 2-3, 3-4, 4-0
 *   **Inner Star:** 5-7, 7-9, 9-6, 6-8, 8-5
@@ -123,4 +95,8 @@ graph TD
 *   Define edges as a list of pairs `(u, v)` and iterate over them to add `u != v` constraints.
 *   The backtracking loop is the core of this exercise.
 
+## Further Reading
 
+*   [Z3 Guide: Incremental Solving](https://z3prover.github.io/api/html/z3.html#incremental-solving)
+*   [Satisfiability Modulo Theories (SMT)](https://en.wikipedia.org/wiki/Satisfiability_modulo_theories)
+*   [Petersen Graph on Wikipedia](https://en.wikipedia.org/wiki/Petersen_graph)
