@@ -76,6 +76,8 @@ fn demonstrate_maximization() {
     // Objective: Maximize Total Value
     opt.maximize(&total_value);
 
+    println!("{opt:?}");
+
     // Solve
     if opt.check(&[]) == SatResult::Sat {
         let model = opt.get_model().unwrap();
@@ -184,6 +186,8 @@ fn solve_aoc_day10() {
             sum_presses = &sum_presses + p;
         }
         opt.minimize(&sum_presses);
+
+        println!("{opt:?}");
 
         // Solve
         if opt.check(&[]) == SatResult::Sat {

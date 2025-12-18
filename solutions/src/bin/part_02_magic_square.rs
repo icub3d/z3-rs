@@ -49,6 +49,8 @@ fn main() {
     // TR -> BL
     solver.assert((&grid[0][2] + &grid[1][1] + &grid[2][0]).eq(15));
 
+    println!("{solver:?}");
+
     for grid in solver.solutions(&grid, true) {
         println!("Magic Square Found:");
         for row in &grid {
