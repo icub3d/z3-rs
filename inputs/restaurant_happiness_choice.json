@@ -1,0 +1,32 @@
+{
+  "budget": 200,
+  "restaurants": [
+    { "name": "Budget Bistro", "cost": 15, "vegan": false },
+    { "name": "Happy Diner", "cost": 20, "vegan": false },
+    { "name": "Deluxe Restaurant", "cost": 30, "vegan": false },
+    { "name": "Fancy Place", "cost": 25, "vegan": false },
+    { "name": "Cozy Cafe", "cost": 18, "vegan": false }
+  ],
+  "people": [
+    { 
+      "name": "Alice", 
+      "is_vegan": false, 
+      "ratings": [6, 8, 10, 7, 5] 
+    },
+    { 
+      "name": "Bob", 
+      "is_vegan": false, 
+      "ratings": [7, 9, 10, 8, 6] 
+    },
+    { 
+      "name": "Charlie", 
+      "is_vegan": false, 
+      "ratings": [5, 7, 10, 9, 4] 
+    },
+    { 
+      "name": "Diana", 
+      "is_vegan": false, 
+      "ratings": [8, 10, 9, 6, 7] 
+    }
+  ]
+}

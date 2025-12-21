@@ -47,11 +47,7 @@ fn main() {
     let ty = Int::new_const("ty");
     let tz = Int::new_const("tz");
 
-    // Count In-Range Bots
-    let mut count = Int::from_i64(0);
-    let one = Int::from_i64(1);
-    let zero = Int::from_i64(0);
-
+    // Maximize In-Range Bots
     for bot in &bots {
         // Dist = |tx - bx| + |ty - by| + |tz - bz|
         let d = &distance(&tx, bot.x) + &distance(&ty, bot.y) + &distance(&tz, bot.z);
@@ -59,13 +55,9 @@ fn main() {
         // In Range: Dist <= r
         let in_range = d.le(Int::from_i64(bot.r));
 
-        // Add 1 if true, 0 if false
-        let val = in_range.ite(&one, &zero);
-        count = &count + &val;
+        // Soft constraint: prefer satisfying this (weight 1)
+        opt.assert_soft(&in_range, 1, None);
     }
-
-    // Primary Objective: Maximize Count
-    opt.maximize(&count);
 
     // Secondary Objective: Minimize Distance to Origin
     let dist_origin = &distance(&tx, 0) + &distance(&ty, 0) + &distance(&tz, 0);
@@ -76,10 +68,8 @@ fn main() {
         let x = model.eval(&tx, true).unwrap();
         let y = model.eval(&ty, true).unwrap();
         let z = model.eval(&tz, true).unwrap();
-        let c = model.eval(&count, true).unwrap();
 
         println!("Optimal Coordinate: ({}, {}, {})", x, y, z);
-        println!("Bots in range: {}", c);
         println!(
             "Solution: {}",
             x.as_i64().unwrap().abs() + y.as_i64().unwrap().abs() + z.as_i64().unwrap().abs()

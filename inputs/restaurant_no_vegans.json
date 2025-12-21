@@ -1,0 +1,26 @@
+{
+  "budget": 80,
+  "restaurants": [
+    { "name": "Burger Joint", "cost": 12, "vegan": false },
+    { "name": "Steakhouse", "cost": 35, "vegan": false },
+    { "name": "Pizza Palace", "cost": 18, "vegan": false },
+    { "name": "Sushi Bar", "cost": 28, "vegan": false }
+  ],
+  "people": [
+    { 
+      "name": "Alice", 
+      "is_vegan": false, 
+      "ratings": [7, 9, 8, 10] 
+    },
+    { 
+      "name": "Bob", 
+      "is_vegan": false, 
+      "ratings": [8, 7, 9, 6] 
+    },
+    { 
+      "name": "Charlie", 
+      "is_vegan": false, 
+      "ratings": [6, 10, 7, 8] 
+    }
+  ]
+}

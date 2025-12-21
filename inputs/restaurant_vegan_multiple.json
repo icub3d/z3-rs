@@ -1,0 +1,26 @@
+{
+  "budget": 100,
+  "restaurants": [
+    { "name": "Vegan Delight", "cost": 20, "vegan": true },
+    { "name": "Green Cafe", "cost": 22, "vegan": true },
+    { "name": "Plant Palace", "cost": 18, "vegan": true },
+    { "name": "Burger Shack", "cost": 12, "vegan": false }
+  ],
+  "people": [
+    { 
+      "name": "Alice", 
+      "is_vegan": true, 
+      "ratings": [8, 10, 7, 0] 
+    },
+    { 
+      "name": "Bob", 
+      "is_vegan": true, 
+      "ratings": [9, 9, 8, 0] 
+    },
+    { 
+      "name": "Charlie", 
+      "is_vegan": false, 
+      "ratings": [7, 8, 6, 10] 
+    }
+  ]
+}

@@ -1,9 +1,8 @@
 use serde::Deserialize;
-// VERIFICATION COMMENT
 use std::env;
 use std::fs::File;
 use std::io::{self, Read};
-use z3::ast::Int;
+use z3::ast::{Bool, Int};
 use z3::{Optimize, SatResult};
 
 #[derive(Deserialize, Debug)]
@@ -22,10 +21,9 @@ struct Restaurant {
 
 #[derive(Deserialize, Debug)]
 struct Person {
-    #[serde(rename = "name")]
-    _name: String,
+    name: String,
     is_vegan: bool,
-    ratings: Vec<i64>, // rating per restaurant index
+    ratings: Vec<i64>,
 }
 
 fn get_input() -> InputData {
@@ -39,86 +37,79 @@ fn get_input() -> InputData {
     serde_json::from_reader(reader).expect("Failed to parse JSON input")
 }
 
-// Helper to select value based on index
-fn get_value_by_index(idx_var: &Int, values: &[i64], default: i64) -> Int {
-    let mut expr = Int::from_i64(default);
-    for (i, val) in values.iter().enumerate().rev() {
-        let i_const = Int::from_i64(i as i64);
-        let v_const = Int::from_i64(*val);
-        expr = idx_var.eq(&i_const).ite(&v_const, &expr);
-    }
-    expr
-}
-
 fn main() {
     let data = get_input();
     let opt = Optimize::new();
 
-    // Variable: Chosen Restaurant Index
-    let chosen = Int::new_const("chosen_idx");
+    // One-hot encoding: Boolean variable for each restaurant
+    let is_chosen: Vec<Bool> = (0..data.restaurants.len())
+        .map(|i| Bool::new_const(format!("restaurant_{}", i)))
+        .collect();
 
-    // Constraints
-    // Range: 0 <= idx < num_restaurants
-    opt.assert(&chosen.ge(0));
-    opt.assert(&chosen.lt(data.restaurants.len() as i64));
+    // Exactly one restaurant must be chosen
+    let constraints: Vec<(&Bool, i32)> = is_chosen.iter().map(|b| (b, 1)).collect();
+    // NOTE: This allows us to potentially pick the "best N". Here we choose 1.
+    opt.assert(&Bool::pb_eq(&constraints, 1));
 
-    // Map idx -> cost
-    let costs: Vec<i64> = data.restaurants.iter().map(|r| r.cost).collect();
-    let chosen_cost = get_value_by_index(&chosen, &costs, 999999);
+    // Build happiness terms and add budget constraints for each restaurant
+    let happiness_terms: Vec<Int> = data
+        .restaurants
+        .iter()
+        .enumerate()
+        .map(|(i, restaurant)| {
+            // Budget constraint: if this restaurant is chosen, cost must be within budget
+            let total_cost = restaurant.cost * data.people.len() as i64;
+            opt.assert(&is_chosen[i].implies(Int::from_i64(total_cost).le(data.budget)));
 
-    //
-    let total_cost = &chosen_cost * (data.people.len() as i64);
-    opt.assert(&total_cost.le(Int::from_i64(data.budget)));
-
-    // 3. Objective: Maximize Happiness
-    // Total Happiness = Sum of ratings for chosen restaurant
-    // NOTE: Removed strict vegan constraint. Instead, if a person is vegan,
-    // their happiness is 0 if the chosen restaurant is not vegan.
-    let mut total_happiness = Int::from_i64(0);
-
-    for p in &data.people {
-        // Adjust ratings if person is vegan: 0 happiness for non-vegan places
-        let effective_ratings: Vec<i64> = if p.is_vegan {
-            p.ratings
+            let restaurant_happiness: i64 = data
+                .people
                 .iter()
-                .enumerate()
-                .map(|(i, &r)| if data.restaurants[i].vegan { r } else { 0 })
-                .collect()
-        } else {
-            p.ratings.clone()
-        };
+                .map(|person| {
+                    if person.is_vegan && !restaurant.vegan {
+                        0
+                    } else {
+                        person.ratings[i]
+                    }
+                })
+                .sum();
 
-        // Person's happiness = get_value_by_index(chosen_idx, effective_ratings)
-        let p_happiness = get_value_by_index(&chosen, &effective_ratings, 0);
-        total_happiness = &total_happiness + &p_happiness;
-    }
+            // If chosen, contribute happiness; otherwise contribute 0
+            is_chosen[i].ite(&Int::from_i64(restaurant_happiness), &Int::from_i64(0))
+        })
+        .collect();
 
+    // Sum up all happiness terms (only one will be non-zero)
+    let terms_refs: Vec<&Int> = happiness_terms.iter().collect();
+    let total_happiness = Int::add(&terms_refs);
+
+    // Maximize happiness
     opt.maximize(&total_happiness);
 
-    // 4. Solve
     if opt.check(&[]) == SatResult::Sat {
         let model = opt.get_model().unwrap();
-        let idx = model.eval(&chosen, true).unwrap().as_i64().unwrap() as usize;
-        let r_name = &data.restaurants[idx].name;
-        let happy_val = model.eval(&total_happiness, true).unwrap();
+        let chosen_idx = is_chosen
+            .iter()
+            .position(|var| model.eval(var, true).unwrap().as_bool().unwrap())
+            .unwrap();
 
-        println!("Selected Restaurant: {} (Index {})", r_name, idx);
-        println!("Total Happiness: {}", happy_val);
-        println!("Cost per head: ${}", data.restaurants[idx].cost);
+        println!(
+            "Selected Restaurant: {} (Index {})",
+            data.restaurants[chosen_idx].name, chosen_idx
+        );
+        println!(
+            "Total Happiness: {}",
+            model.eval(&total_happiness, true).unwrap()
+        );
+        println!("Cost per head: ${}", data.restaurants[chosen_idx].cost);
 
         println!("\nIndividual Happiness:");
-        for p in &data.people {
-            let effective_ratings: Vec<i64> = if p.is_vegan {
-                p.ratings
-                    .iter()
-                    .enumerate()
-                    .map(|(i, &r)| if data.restaurants[i].vegan { r } else { 0 })
-                    .collect()
+        for person in &data.people {
+            let happiness = if person.is_vegan && !data.restaurants[chosen_idx].vegan {
+                0
             } else {
-                p.ratings.clone()
+                person.ratings[chosen_idx]
             };
-            let person_happiness = effective_ratings[idx]; // Directly get the rating for the chosen index
-            println!("  {}: {}", p._name, person_happiness);
+            println!("  {}: {}", person.name, happiness);
         }
     } else {
         println!("No suitable restaurant found within budget/constraints.");
