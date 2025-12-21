@@ -1,9 +1,7 @@
+use serde::Deserialize;
 use std::env;
 use std::fs::File;
 use std::io::{self, Read};
-use z3::{Solver, SatResult};
-use z3::ast::{Ast, Bool, Int};
-use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 struct NonogramPuzzle {
@@ -26,33 +24,5 @@ fn get_input() -> NonogramPuzzle {
 
 fn main() {
     let puzzle = get_input();
-
-    println!("Loaded Nonogram: {}x{}", puzzle.rows, puzzle.cols);
-
-    let solver = Solver::new();
-
-    // 1. Create Grid Variables
-    // let mut grid_vars = ...
-
-    // 2. Add Constraints
-    // Implement logic to map row/col clues to Z3 constraints.
-
-    println!("TODO: Implement solver logic!");
-    
-    // 3. Solve & Print
-    /*
-    if solver.check() == SatResult::Sat {
-        let model = solver.get_model().unwrap();
-        for r in 0..puzzle.rows {
-            for c in 0..puzzle.cols {
-                // Check if grid_vars[r][c] is true
-                let is_filled = ...; 
-                print!("{}", if is_filled { "##" } else { ".." });
-            }
-            println!();
-        }
-    } else {
-        println!("Unsolvable!");
-    }
-    */
+    // YOUR CODE HERE
 }

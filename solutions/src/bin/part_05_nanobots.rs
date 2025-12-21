@@ -30,32 +30,31 @@ fn get_input() -> Vec<Bot> {
     data.bots
 }
 
+// Helper function to get the distance from a to b as an Int (via ge/ite).
+fn distance(a: &Int, b: i64) -> Int {
+    let b_val = Int::from_i64(b);
+    let diff = a - &b_val;
+    let neg_diff = &b_val - a;
+    a.ge(&b_val).ite(&diff, &neg_diff)
+}
+
 fn main() {
     let bots = get_input();
     let opt = Optimize::new();
 
-    // 1. Target Coordinates
+    // Target Coordinates
     let tx = Int::new_const("tx");
     let ty = Int::new_const("ty");
     let tz = Int::new_const("tz");
 
-    // Helper: Absolute Value
-    // abs(a - b) = If(a > b, a - b, b - a)
-    fn dist_1d(a: &Int, b: i64) -> Int {
-        let b_val = Int::from_i64(b);
-        let diff = a - &b_val;
-        let neg_diff = &b_val - a;
-        a.ge(&b_val).ite(&diff, &neg_diff)
-    }
-
-    // 2. Count In-Range Bots
+    // Count In-Range Bots
     let mut count = Int::from_i64(0);
     let one = Int::from_i64(1);
     let zero = Int::from_i64(0);
 
     for bot in &bots {
         // Dist = |tx - bx| + |ty - by| + |tz - bz|
-        let d = &dist_1d(&tx, bot.x) + &dist_1d(&ty, bot.y) + &dist_1d(&tz, bot.z);
+        let d = &distance(&tx, bot.x) + &distance(&ty, bot.y) + &distance(&tz, bot.z);
 
         // In Range: Dist <= r
         let in_range = d.le(Int::from_i64(bot.r));
@@ -65,11 +64,11 @@ fn main() {
         count = &count + &val;
     }
 
-    // 3. Primary Objective: Maximize Count
+    // Primary Objective: Maximize Count
     opt.maximize(&count);
 
-    // 4. Secondary Objective: Minimize Distance to Origin
-    let dist_origin = &dist_1d(&tx, 0) + &dist_1d(&ty, 0) + &dist_1d(&tz, 0);
+    // Secondary Objective: Minimize Distance to Origin
+    let dist_origin = &distance(&tx, 0) + &distance(&ty, 0) + &distance(&tz, 0);
     opt.minimize(&dist_origin);
 
     if opt.check(&[]) == SatResult::Sat {
@@ -81,6 +80,10 @@ fn main() {
 
         println!("Optimal Coordinate: ({}, {}, {})", x, y, z);
         println!("Bots in range: {}", c);
+        println!(
+            "Solution: {}",
+            x.as_i64().unwrap().abs() + y.as_i64().unwrap().abs() + z.as_i64().unwrap().abs()
+        );
     } else {
         println!("UNSAT");
     }

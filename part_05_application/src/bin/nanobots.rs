@@ -1,9 +1,7 @@
+use serde::Deserialize;
 use std::env;
 use std::fs::File;
 use std::io::{self, Read};
-use z3::{Optimize, SatResult};
-use z3::ast::{Ast, Int};
-use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 struct Bot {
@@ -32,26 +30,5 @@ fn get_input() -> Vec<Bot> {
 
 fn main() {
     let bots = get_input();
-
-    println!("Loaded {} nanobots.", bots.len());
-
-    let opt = Optimize::new();
-
-    // 1. Define Variables (tx, ty, tz)
-    
-    // 2. Define Metric (Manhattan Distance)
-    
-    // 3. Maximize Count of bots in range
-    //    bot[i] is in range if |tx-bx| + |ty-by| + |tz-bz| <= br
-
-    // 4. Minimize Distance to Origin (Tie-Breaker)
-
-    println!("TODO: Implement optimizer logic!");
-
-    /*
-    if opt.check(&[]) == SatResult::Sat {
-        let model = opt.get_model().unwrap();
-        // Print tx, ty, tz and the count
-    }
-    */
+    // YOUR CODE HERE
 }

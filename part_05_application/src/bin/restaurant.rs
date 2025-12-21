@@ -1,9 +1,7 @@
+use serde::Deserialize;
 use std::env;
 use std::fs::File;
 use std::io::{self, Read};
-use z3::{Optimize, SatResult};
-use z3::ast::{Ast, Int};
-use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 struct InputData {
@@ -39,27 +37,5 @@ fn get_input() -> InputData {
 
 fn main() {
     let data = get_input();
-
-    println!("Loaded Data:");
-    println!("  Budget: ${}", data.budget);
-    println!("  Restaurants: {}", data.restaurants.len());
-    println!("  People: {}", data.people.len());
-    println!("--------------------------------------------------");
-
-    // 2. Setup Optimizer
-    let opt = Optimize::new();
-
-    // 3. YOUR CODE HERE
-    // TODO: Define variables (e.g., chosen restaurant index)
-    // TODO: Add constraints (Valid index, Budget, Vegan compatibility)
-    // TODO: Define Objective (Maximize total happiness)
-    
-    println!("TODO: Implement the solver logic!");
-    println!("--------------------------------------------------");
-
-    // 4. Output Result
-    // If SAT:
-    //    println!("Selected Restaurant: {}", ...);
-    //    println!("Total Cost: ${}", ...);
-    //    println!("Total Happiness: {}", ...);
+    // YOUR CODE HERE
 }
