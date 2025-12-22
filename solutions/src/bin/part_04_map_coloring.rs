@@ -15,11 +15,23 @@ impl Graph {
             num_nodes: 10,
             edges: vec![
                 // Outer Cycle
-                (0, 1), (1, 2), (2, 3), (3, 4), (4, 0),
+                (0, 1),
+                (1, 2),
+                (2, 3),
+                (3, 4),
+                (4, 0),
                 // Spokes
-                (0, 5), (1, 6), (2, 7), (3, 8), (4, 9),
+                (0, 5),
+                (1, 6),
+                (2, 7),
+                (3, 8),
+                (4, 9),
                 // Inner Star (5-7-9-6-8-5)
-                (5, 7), (7, 9), (9, 6), (6, 8), (8, 5),
+                (5, 7),
+                (7, 9),
+                (9, 6),
+                (6, 8),
+                (8, 5),
             ],
         }
     }
@@ -46,13 +58,13 @@ impl Map {
         // 1. Domain Constraints (Color is 1, 2, or 3)
         for r in &self.regions {
             // Using explicit i64 to help type inference
-            solver.assert(&r.ge(1i64));
-            solver.assert(&r.le(3i64));
+            solver.assert(r.ge(1i64));
+            solver.assert(r.le(3i64));
         }
 
         // 2. Graph Edges
         for (u, v) in &self.graph.edges {
-            solver.assert(&self.regions[*u].eq(&self.regions[*v]).not());
+            solver.assert(self.regions[*u].eq(&self.regions[*v]).not());
         }
     }
 }
@@ -72,7 +84,10 @@ impl ColoringSolver {
 
     // The DFS Logic
     fn solve_dfs(&self, map: &Map) {
-        println!("Starting search on Graph ({} nodes)...", map.graph.num_nodes);
+        println!(
+            "Starting search on Graph ({} nodes)...",
+            map.graph.num_nodes
+        );
 
         let num_regions = map.graph.num_nodes;
         let mut current_idx = 0;
@@ -98,7 +113,7 @@ impl ColoringSolver {
                 self.solver.push(); // Checkpoint
 
                 // Assert: Region = Color
-                self.solver.assert(&region.eq(color));
+                self.solver.assert(region.eq(color));
 
                 if self.solver.check() == SatResult::Sat {
                     // Good move!
@@ -163,3 +178,4 @@ fn main() {
     // Run Search
     coloring_solver.solve_dfs(&map);
 }
+
